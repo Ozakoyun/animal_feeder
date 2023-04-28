@@ -2,7 +2,7 @@
 
 {% block title %}
     {% if title %}
-        {{ title }}
+        Animal Feeder - {{ title }}
     {% else %}
         Animal Feeder
     {% endif %}
@@ -17,6 +17,7 @@
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('add_timetable') }}">add Schedule</a></li>
                 </ul>
             </div>
         </div>
