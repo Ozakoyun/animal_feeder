@@ -1,8 +1,8 @@
-"""init db
+"""init
 
-Revision ID: 6ae022866637
+Revision ID: f59d756379f1
 Revises: 
-Create Date: 2023-04-27 14:59:15.076647
+Create Date: 2023-05-04 23:05:31.890814
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6ae022866637'
+revision = 'f59d756379f1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,13 +24,16 @@ def upgrade():
     sa.Column('portion_size', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_food_created'), 'food', ['created'], unique=False)
     op.create_table('timetable',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('output_time', sa.DateTime(), nullable=False),
-    sa.Column('weekday', sa.Integer(), nullable=False),
+    sa.Column('weekday', sa.String(), nullable=False),
+    sa.Column('food_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['food_id'], ['food.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('food_dispensed',
@@ -38,10 +41,10 @@ def upgrade():
     sa.Column('amount_dispensed', sa.Integer(), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=False),
     sa.Column('trigger', sa.Integer(), nullable=False),
-    sa.Column('food_id', sa.Integer(), nullable=False),
-    sa.Column('tiemtable_id', sa.Integer(), nullable=True),
+    sa.Column('food_id', sa.Integer(), nullable=True),
+    sa.Column('timetable_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['food_id'], ['food.id'], ),
-    sa.ForeignKeyConstraint(['tiemtable_id'], ['timetable.id'], ),
+    sa.ForeignKeyConstraint(['timetable_id'], ['timetable.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

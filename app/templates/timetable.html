@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Hi, here are your timetables!</h1>
+    <a class="btn btn-success" href="{{ url_for('add_timetable') }}">Add timetable here!</a>
+    <div>
+        {% if len_timetable == 0 %}
+            <h3><small>No timetable added!</small></h3>
+        {% else %}
+            <table class="table table-hover">
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Food</th>
+                    <th class="text-center">Weekday</th>
+                    <th class="text-center">Output Time</th>
+                </tr>
+                {% for timetable, food in all_timetable %}
+                    <tr>
+                        <td class="text-center">{{ timetable.id }}</td>
+                        <td class="text-center">{{ food }}</td>
+                        <td class="text-center">{{ timetable.weekday }}</td>
+                        <td class="text-center">{{ timetable.output_time|datetimeformat('%H:%M:%S') }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

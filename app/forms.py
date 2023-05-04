@@ -4,10 +4,11 @@ from wtforms import (
     SubmitField,
     SelectField,
     IntegerField,
-    SelectMultipleField,
-    DateTimeField,
+    TimeField,
 )
 from wtforms.validators import DataRequired
+from datetime import datetime
+from app.util import get_food
 
 
 class ManualFoodForm(FlaskForm):
@@ -15,19 +16,37 @@ class ManualFoodForm(FlaskForm):
 
 
 class TimeTableForm(FlaskForm):
-    food = SelectField(label='Select food', validators=[DataRequired()], choices=[(1, 'Food 1'), (2, 'Food 2'), (3, 'Food 3')])
-    weekday = SelectMultipleField(
+    food = SelectField(
+        label="Select food",
+        validators=[DataRequired()],
+        choices=get_food(),
+    )
+    weekday = SelectField(
         choices=[
-            (0, "Monday"),
-            (1, "Tuesday"),
-            (2, "Wednesday"),
-            (3, "Thursday"),
-            (4, "Friday"),
-            (5, "Saturday"),
-            (6, "Sunday"),
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
         ],
         label="Weekday",
         validators=[DataRequired()],
     )
-    time = DateTimeField("Time", format="%H:%M", validators=[DataRequired()])
-    submit = SubmitField("Set")
+    time = TimeField("Time", format="%H:%M", validators=[DataRequired()], default=datetime.now().time())
+    cancel = SubmitField(label="Cancel", render_kw={"formnovalidate": True})
+    submit = SubmitField("Create")
+
+
+class FoodForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    portion_size = IntegerField("Portion size", validators=[DataRequired()])
+    amount = IntegerField("Amount", validators=[DataRequired()])
+    cancel = SubmitField(label="Cancel", render_kw={"formnovalidate": True})
+    submit = SubmitField("Submit")
+
+
+class CancelForm(FlaskForm):
+    cancel = SubmitField(label="No", render_kw={"formnovalidate": True})
+    submit = SubmitField("Yes")
