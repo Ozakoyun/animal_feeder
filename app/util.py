@@ -1,7 +1,26 @@
-from app import app, db
+from app import app, db, mqtt
 from app.models import Food, FoodDispensed, Timetable
+import RPi.GPIO as GPIO
+from RpiMotorLib import RpiMotorLib
+
+
+gpio_pins = [6,13,19,26]
+mymotor = RpiMotorLib.BYJMotor("MyMotorOne","28BYJ")
+
+
+def setupGPIO():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(18, GPIO.OUT)
+
 
 def get_food():
     food = Food.query.all()
     food = [(f.id, f.name) for f in food]
     return food
+
+
+def dispense_food(trigger):
+    mymotor.motor_run(gpio_pins, 0.001, 42, True, False, "half", 0.001)
+    mqtt.publish("animal_feeder",f"Food dispensed by {trigger} way !")
+

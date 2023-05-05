@@ -3,12 +3,17 @@ from flask import render_template, redirect, url_for
 from app.forms import TimeTableForm, FoodForm, CancelForm
 from app.models import Food, FoodDispensed, Timetable
 from datetime import datetime, timedelta
-from app.util import get_food
+from app.util import get_food, dispense_food
 
 
 @app.route("/")
 @app.route("/index")
 def index():
+    return render_template("index.html", title="Home")
+
+@app.route("/dispensing/", methods=["POST"])
+def dispense():
+    dispense_food("manual")
     return render_template("index.html", title="Home")
 
 
