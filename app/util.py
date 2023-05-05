@@ -11,7 +11,6 @@ mymotor = RpiMotorLib.BYJMotor("MyMotorOne","28BYJ")
 def setupGPIO():
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    GPIO.setup(18, GPIO.OUT)
 
 
 def get_food():
