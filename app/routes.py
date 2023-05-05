@@ -2,7 +2,8 @@ from app import app, db
 from flask import render_template, redirect, url_for
 from app.forms import TimeTableForm, FoodForm, CancelForm
 from app.models import Food, FoodDispensed, Timetable
-from datetime import datetime
+from datetime import datetime, timedelta
+from app.util import get_food
 
 
 @app.route("/")
@@ -57,8 +58,6 @@ def edit_food(food_id):
 @app.route("/delete_food/<int:food_id>", methods=["GET", "POST"])
 def delete_food(food_id):
     food = Food.query.filter_by(id=food_id).first()
-    food_id_now = food.id
-    print(f"Deleting food id {food_id_now} - {food_id}")
     form = CancelForm()
     if form.cancel.data:
         return redirect(url_for("food"))
@@ -73,12 +72,18 @@ def delete_food(food_id):
 def timetable():
     all_timetable = Timetable.query.all()
     foods = []
+    times = []
     for t in all_timetable:
         foods.append(Food.query.filter_by(id=t.food_id).first().name)
+        delta = timedelta(minutes=t.output_time_minutes)
+        start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        result_datetime = start_of_day + delta
+        result_time = result_datetime.time()
+        times.append(result_time)
     return render_template(
         "timetable.html",
         title="Timetable",
-        all_timetable=zip(all_timetable, foods),
+        all_timetable=zip(all_timetable, foods, times),
         len_timetable=len(all_timetable),
     )
 
@@ -87,21 +92,48 @@ def timetable():
 def add_timetable():
     form = TimeTableForm()
     if form.validate_on_submit():
-        print(f"Food id: {form.food.data}")
-        print(f"Day: {form.weekday.data}")
-        print(f"Time: {form.time.data}")
-        print(f"class: {form.time.data.__class__}")
-        
         timetable = Timetable(
             food_id=form.food.data,
             weekday=form.weekday.data,
-            output_time=form.time.data,
+            output_time_minutes=form.time.data.hour * 60 + form.time.data.minute,
         )
         db.session.add(timetable)
         db.session.commit()
         return redirect(url_for("timetable"))
     return render_template("add_timetable.html", title="Add Timetable", form=form)
 
+
+@app.route("/edit_timetable/<int:timetable_id>", methods=["GET", "POST"])
+def edit_timetable(timetable_id):
+    form = TimeTableForm()
+    timetable = Timetable.query.filter_by(id=timetable_id).first()
+    print(timetable)
+    if form.cancel.data:
+        return redirect(url_for("timetable"))
+    if form.validate_on_submit():
+        timetable.food_id = form.food.data
+        timetable.weekday = form.weekday.data
+        timetable.output_time_minutes = form.time.data.hour * 60 + form.time.data.minute
+        db.session.commit()
+        return redirect(url_for("timetable"))
+    food_choices = get_food()
+    food_choices.remove((timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name))
+    form.food.choices = [(timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name)] + food_choices
+    form.food.data = timetable.food_id
+    form.weekday.data = timetable.weekday
+    return render_template("edit_timetable.html", title="Edit Timetable", form=form)
+
+@app.route("/delete_timetable/<int:timetable_id>", methods=["GET", "POST"])
+def delete_timetable(timetable_id):
+    timetable = Timetable.query.filter_by(id=timetable_id).first()
+    form = CancelForm()
+    if form.cancel.data:
+        return redirect(url_for("timetable"))
+    if form.validate_on_submit():
+        db.session.delete(timetable)
+        db.session.commit()
+        return redirect(url_for("timetable"))
+    return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 
 @app.template_filter("datetimeformat")
 def datetimeformat(value, datetime_format="%d.%m.%Y at %H:%M:%S"):
@@ -157,10 +189,10 @@ def test():
     print("Added entries to Food table")
 
     # Add entries to Timetable table
-    t1 = Timetable(output_time=datetime.utcnow(), weekday="Monday", food_id=1)
-    t2 = Timetable(output_time=datetime.utcnow(), weekday="Wednesday", food_id=2)
-    t3 = Timetable(output_time=datetime.utcnow(), weekday="Friday", food_id=3)
-    t4 = Timetable(output_time=datetime.utcnow(), weekday="Sunday", food_id=4)
+    t1 = Timetable(output_time_minutes=650, weekday="Monday", food_id=1)
+    t2 = Timetable(output_time_minutes=650, weekday="Wednesday", food_id=2)
+    t3 = Timetable(output_time_minutes=650, weekday="Friday", food_id=3)
+    t4 = Timetable(output_time_minutes=650, weekday="Sunday", food_id=4)
 
     db.session.add(t1)
     db.session.add(t2)

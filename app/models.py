@@ -47,7 +47,7 @@ class FoodDispensed(db.Model):
 
 class Timetable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    output_time = db.Column(db.DateTime, nullable=False) # probably save as seconds since midnight
+    output_time_minutes = db.Column(db.Integer, nullable=False) # probably save as seconds since midnight
     weekday = db.Column(db.String, nullable=False)
     food_id = db.Column(db.Integer, db.ForeignKey("food.id"), nullable=False)
     food_dispensed = db.relationship(
@@ -56,5 +56,5 @@ class Timetable(db.Model):
 
     def __repr__(self):
         return "<id {}: output_time: {}, weekday: {}, food_id: {}, food_dispensed>".format(
-            self.id, self.output_time, self.weekday, self.food_id, self.food_dispensed
+            self.id, self.output_time_minutes, self.weekday, self.food_id, self.food_dispensed
         )

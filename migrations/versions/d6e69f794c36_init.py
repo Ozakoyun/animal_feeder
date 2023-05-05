@@ -1,8 +1,8 @@
 """init
 
-Revision ID: f59d756379f1
+Revision ID: d6e69f794c36
 Revises: 
-Create Date: 2023-05-04 23:05:31.890814
+Create Date: 2023-05-05 14:52:25.580105
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f59d756379f1'
+revision = 'd6e69f794c36'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,7 +30,7 @@ def upgrade():
     op.create_index(op.f('ix_food_created'), 'food', ['created'], unique=False)
     op.create_table('timetable',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('output_time', sa.DateTime(), nullable=False),
+    sa.Column('output_time_minutes', sa.Integer(), nullable=False),
     sa.Column('weekday', sa.String(), nullable=False),
     sa.Column('food_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['food_id'], ['food.id'], ),
