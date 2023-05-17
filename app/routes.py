@@ -1,14 +1,15 @@
-from app import app, db
+from app import app, db, scheduler
 from flask import render_template, redirect, url_for
 from app.forms import TimeTableForm, FoodForm, CancelForm
 from app.models import Food, FoodDispensed, Timetable
 from datetime import datetime, timedelta
-from app.util import get_food, dispense_food
+from app.util import get_food, dispense_food, calculate_weekday, calculate_hour, calculate_minutes_remaining
 
 
 @app.route("/")
 @app.route("/index")
 def index():
+    print(scheduler.get_jobs())
     return render_template("index.html", title="Home")
 
 @app.route("/dispensing/", methods=["POST"])
@@ -120,6 +121,9 @@ def edit_timetable(timetable_id):
         timetable.weekday = form.weekday.data
         timetable.output_time_minutes = form.time.data.hour * 60 + form.time.data.minute
         db.session.commit()
+        scheduler.reschedule_job(timetable.food_id, trigger='cron', day_of_week=calculate_weekday(timetable.weekday),
+                          hour=calculate_hour(timetable.output_time_minutes),
+                          minute=calculate_minutes_remaining(timetable.output_time_minutes))
         return redirect(url_for("timetable"))
     food_choices = get_food()
     food_choices.remove((timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name))
@@ -137,6 +141,7 @@ def delete_timetable(timetable_id):
     if form.validate_on_submit():
         db.session.delete(timetable)
         db.session.commit()
+        scheduler.remove_job(id)
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 
