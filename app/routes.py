@@ -105,6 +105,9 @@ def add_timetable():
         )
         db.session.add(timetable)
         db.session.commit()
+        scheduler.add_job(dispense_food, 'cron', day_of_week=calculate_weekday(form.weekday.data),
+                          hour=calculate_hour(form.time.data.hour * 60 + form.time.data.minute), id=str(timetable.id),
+                          minute=calculate_minutes_remaining(form.time.data.hour * 60 + form.time.data.minute))
         return redirect(url_for("timetable"))
     return render_template("add_timetable.html", title="Add Timetable", form=form)
 
@@ -121,9 +124,10 @@ def edit_timetable(timetable_id):
         timetable.weekday = form.weekday.data
         timetable.output_time_minutes = form.time.data.hour * 60 + form.time.data.minute
         db.session.commit()
-        scheduler.reschedule_job(timetable.food_id, trigger='cron', day_of_week=calculate_weekday(timetable.weekday),
-                          hour=calculate_hour(timetable.output_time_minutes),
-                          minute=calculate_minutes_remaining(timetable.output_time_minutes))
+        scheduler.reschedule_job(str(timetable.food_id), trigger='cron',
+                                 day_of_week=calculate_weekday(timetable.weekday),
+                                 hour=calculate_hour(timetable.output_time_minutes),
+                                 minute=calculate_minutes_remaining(timetable.output_time_minutes))
         return redirect(url_for("timetable"))
     food_choices = get_food()
     food_choices.remove((timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name))
@@ -141,7 +145,7 @@ def delete_timetable(timetable_id):
     if form.validate_on_submit():
         db.session.delete(timetable)
         db.session.commit()
-        scheduler.remove_job(id)
+        scheduler.remove_job(str(id))
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 

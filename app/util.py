@@ -19,7 +19,7 @@ def get_food():
     return food
 
 
-def dispense_food(trigger):
+def dispense_food(trigger="automatic"):
     mymotor.motor_run(gpio_pins, 0.001, 42, True, False, "half", 0.001)
     mqtt.publish("animal_feeder",f"Food dispensed by {trigger} way !")
 
