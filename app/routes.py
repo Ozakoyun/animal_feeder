@@ -9,7 +9,6 @@ from app.util import get_food, dispense_food, calculate_weekday, calculate_hour,
 @app.route("/")
 @app.route("/index")
 def index():
-    print(scheduler.get_jobs())
     return render_template("index.html", title="Home")
 
 @app.route("/dispensing/", methods=["POST"])
@@ -145,7 +144,7 @@ def delete_timetable(timetable_id):
     if form.validate_on_submit():
         db.session.delete(timetable)
         db.session.commit()
-        scheduler.remove_job(str(id))
+        scheduler.remove_job(str(timetable_id))
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 
