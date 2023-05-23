@@ -104,7 +104,8 @@ def add_timetable():
         )
         db.session.add(timetable)
         db.session.commit()
-        scheduler.add_job(dispense_food, 'cron', day_of_week=calculate_weekday(form.weekday.data),
+        scheduler.add_job(dispense_food, 'cron', (form.food.data, timetable.id, 1),
+                          day_of_week=calculate_weekday(form.weekday.data),
                           hour=calculate_hour(form.time.data.hour * 60 + form.time.data.minute), id=str(timetable.id),
                           minute=calculate_minutes_remaining(form.time.data.hour * 60 + form.time.data.minute))
         return redirect(url_for("timetable"))
