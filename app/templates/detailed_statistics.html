@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block app_content %}
+<h1>Hi, here are your detailed statistics for {{ foodName }}!</h1>
+<div>
+  {% if dispenses|length == 0 %}
+  <h3><small>No dispenses done!</small></h3>
+  {% else %}
+  <table class="table table-hover">
+    <tr>
+      <th class="text-center">ID</th>
+      <th class="text-center">dispensed at</th>
+      <th class="text-center">amount dispensed</th>
+      <th class="text-center">trigger</th>
+    </tr>
+    {% for dispense in dispenses %}
+    <tr>
+      <td class="text-center">{{ dispense.id }}</td>
+      <td class="text-center">{{ dispense.created|datetimeformat }}</td>
+      <td class="text-center">{{ dispense.amount_dispensed }}</td>
+      <td class="text-center">{{ dispense.trigger }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <div>
+    <img src="{{ url_for('plot_png', food_id=food_id) }}" alt="plot" />
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

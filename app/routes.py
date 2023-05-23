@@ -1,9 +1,19 @@
-from app import app, db, scheduler
-from flask import render_template, redirect, url_for
+from app import app, db  # , scheduler
+from flask import render_template, redirect, url_for, Response
 from app.forms import TimeTableForm, FoodForm, CancelForm
 from app.models import Food, FoodDispensed, Timetable
 from datetime import datetime, timedelta
-from app.util import get_food, dispense_food, calculate_weekday, calculate_hour, calculate_minutes_remaining
+from app.util import (
+    get_food,
+    calculate_weekday,
+    calculate_hour,
+    calculate_minutes_remaining,
+    getOverview,
+    getDetailedOverview,
+    create_figure,
+)  # , dispense_food
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import io
 
 
 @app.route("/")
@@ -11,9 +21,10 @@ from app.util import get_food, dispense_food, calculate_weekday, calculate_hour,
 def index():
     return render_template("index.html", title="Home")
 
+
 @app.route("/dispensing/", methods=["POST"])
 def dispense():
-    dispense_food("manual")
+    # dispense_food("manual")
     return render_template("index.html", title="Home")
 
 
@@ -104,9 +115,9 @@ def add_timetable():
         )
         db.session.add(timetable)
         db.session.commit()
-        scheduler.add_job(dispense_food, 'cron', day_of_week=calculate_weekday(form.weekday.data),
-                          hour=calculate_hour(form.time.data.hour * 60 + form.time.data.minute), id=str(timetable.id),
-                          minute=calculate_minutes_remaining(form.time.data.hour * 60 + form.time.data.minute))
+        # scheduler.add_job(dispense_food, 'cron', day_of_week=calculate_weekday(form.weekday.data),
+        #                  hour=calculate_hour(form.time.data.hour * 60 + form.time.data.minute), id=str(timetable.id),
+        #                  minute=calculate_minutes_remaining(form.time.data.hour * 60 + form.time.data.minute))
         return redirect(url_for("timetable"))
     return render_template("add_timetable.html", title="Add Timetable", form=form)
 
@@ -123,17 +134,22 @@ def edit_timetable(timetable_id):
         timetable.weekday = form.weekday.data
         timetable.output_time_minutes = form.time.data.hour * 60 + form.time.data.minute
         db.session.commit()
-        scheduler.reschedule_job(str(timetable.food_id), trigger='cron',
-                                 day_of_week=calculate_weekday(timetable.weekday),
-                                 hour=calculate_hour(timetable.output_time_minutes),
-                                 minute=calculate_minutes_remaining(timetable.output_time_minutes))
+        # scheduler.reschedule_job(str(timetable.food_id), trigger='cron',
+        #                         day_of_week=calculate_weekday(timetable.weekday),
+        #                         hour=calculate_hour(timetable.output_time_minutes),
+        #                         minute=calculate_minutes_remaining(timetable.output_time_minutes))
         return redirect(url_for("timetable"))
     food_choices = get_food()
-    food_choices.remove((timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name))
-    form.food.choices = [(timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name)] + food_choices
+    food_choices.remove(
+        (timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name)
+    )
+    form.food.choices = [
+        (timetable.food_id, Food.query.filter_by(id=timetable.food_id).first().name)
+    ] + food_choices
     form.food.data = timetable.food_id
     form.weekday.data = timetable.weekday
     return render_template("edit_timetable.html", title="Edit Timetable", form=form)
+
 
 @app.route("/delete_timetable/<int:timetable_id>", methods=["GET", "POST"])
 def delete_timetable(timetable_id):
@@ -144,9 +160,27 @@ def delete_timetable(timetable_id):
     if form.validate_on_submit():
         db.session.delete(timetable)
         db.session.commit()
-        scheduler.remove_job(str(timetable_id))
+        # scheduler.remove_job(str(timetable_id))
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
+
+
+@app.route("/statistics")
+def statistics():
+    statistics = getOverview()
+    return render_template("statistics.html", title="Statistics", statistics=statistics)
+
+@app.route("/detailed_statistics/<int:food_id>")
+def detailed_statistics(food_id):
+    foodName, dispenses = getDetailedOverview(food_id)
+    return render_template("detailed_statistics.html", title="Detailed Statistics", foodName=foodName, dispenses=dispenses, food_id=food_id)
+
+@app.route("/plot.png/<int:food_id>")
+def plot_png(food_id):
+    fig = create_figure(food_id)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype="image/png")
 
 @app.template_filter("datetimeformat")
 def datetimeformat(value, datetime_format="%d.%m.%Y at %H:%M:%S"):
@@ -213,4 +247,63 @@ def test():
     db.session.add(t4)
     db.session.commit()
     print("Added entries to Timetable table")
+
+    # Add entries to FoodDispensed table
+    dt = datetime.fromisoformat("2023-05-20 00:00:00")
+    f1 = FoodDispensed(
+        amount_dispensed=10, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-21 00:00:00")
+    f2 = FoodDispensed(
+        amount_dispensed=3, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-22 00:00:00")
+    f3 = FoodDispensed(
+        amount_dispensed=8, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-23 00:00:00")
+    f4 = FoodDispensed(
+        amount_dispensed=15, created=dt, trigger=0, food_id=1
+    )
+
+    f5 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f6 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f7 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f8 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+
+    f9 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f10 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f11 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f12 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+
+    db.session.add(f1)
+    db.session.add(f2)
+    db.session.add(f3)
+    db.session.add(f4)
+    db.session.add(f5)
+    db.session.add(f6)
+    db.session.add(f7)
+    db.session.add(f8)
+    db.session.add(f9)
+    db.session.add(f10)
+    db.session.add(f11)
+    db.session.add(f12)
+    db.session.commit()
+
     return render_template("index.html", title="Home")
