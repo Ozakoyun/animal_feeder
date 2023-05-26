@@ -1,9 +1,8 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
     <h1>Hi, User!</h1>
     This is the index Page.
-    <form action="/dispensing/" method="post">
-        <button name="dispenseBtn" type="submit">Dispense food now!</button>
-    </form>
+    {{ wtf.quick_form(form) }}
 {% endblock %}

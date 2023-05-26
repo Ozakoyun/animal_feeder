@@ -1,20 +1,20 @@
 from app import app, db, scheduler
-from flask import render_template, redirect, url_for
-from app.forms import TimeTableForm, FoodForm, CancelForm
+from flask import render_template, redirect, url_for, flash
+from app.forms import TimeTableForm, FoodForm, CancelForm, FoodDispenseForm
 from app.models import Food, FoodDispensed, Timetable
 from datetime import datetime, timedelta
 from app.util import get_food, dispense_food, calculate_weekday, calculate_hour, calculate_minutes_remaining
 
 
-@app.route("/")
-@app.route("/index")
+@app.route("/", methods=["GET","POST"])
+@app.route("/index", methods=["GET","POST"])
 def index():
-    return render_template("index.html", title="Home")
-
-@app.route("/dispensing/", methods=["POST"])
-def dispense():
-    dispense_food("manual")
-    return render_template("index.html", title="Home")
+    form = FoodDispenseForm()
+    if form.validate_on_submit():
+        dispense_food(form.food.data, None, 0)
+        flash("Food successfully dispensed!")
+        return redirect(url_for('index'))
+    return render_template("index.html", form=form, title="Home")
 
 
 @app.route("/food")
@@ -214,4 +214,4 @@ def test():
     db.session.add(t4)
     db.session.commit()
     print("Added entries to Timetable table")
-    return render_template("index.html", title="Home")
+    return redirect(url_for('index'))

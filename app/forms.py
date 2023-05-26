@@ -46,6 +46,13 @@ class FoodForm(FlaskForm):
     cancel = SubmitField(label="Cancel", render_kw={"formnovalidate": True})
     submit = SubmitField("Submit")
 
+class FoodDispenseForm(FlaskForm):
+    food = SelectField(
+        label="Select food to be dispensed",
+        validators=[DataRequired()],
+        choices=get_food(),
+    )
+    submit = SubmitField("Dispense now")
 
 class CancelForm(FlaskForm):
     cancel = SubmitField(label="No", render_kw={"formnovalidate": True})
