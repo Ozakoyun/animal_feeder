@@ -79,6 +79,9 @@ def delete_food(food_id):
     if form.validate_on_submit():
         db.session.delete(food)
         db.session.commit()
+        scheduler.shutdown()
+        scheduler.start()
+        add_jobs()
         return redirect(url_for("food"))
     return render_template("delete_food.html", title="Delete Food", form=form)
 
@@ -171,8 +174,8 @@ def delete_timetable(timetable_id):
         db.session.delete(timetable)
         db.session.commit()
         scheduler.shutdown()
-        add_jobs()
         scheduler.start()
+        add_jobs()
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 
@@ -245,6 +248,63 @@ def test():
     db.session.add(f4)
     db.session.commit()
     print("Added entries to Food table")
+
+    dt = datetime.fromisoformat("2023-05-20 00:00:00")
+    f1 = FoodDispensed(
+        amount_dispensed=10, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-21 00:00:00")
+    f2 = FoodDispensed(
+        amount_dispensed=3, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-22 00:00:00")
+    f3 = FoodDispensed(
+        amount_dispensed=8, created=dt, trigger=0, food_id=1
+    )
+    dt = datetime.fromisoformat("2023-05-23 00:00:00")
+    f4 = FoodDispensed(
+        amount_dispensed=15, created=dt, trigger=0, food_id=1
+    )
+
+    f5 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f6 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f7 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+    f8 = FoodDispensed(
+        amount_dispensed=1, created=datetime.utcnow(), trigger=0, food_id=2
+    )
+
+    f9 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f10 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f11 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+    f12 = FoodDispensed(
+        amount_dispensed=2, created=datetime.utcnow(), trigger=0, food_id=3
+    )
+
+    db.session.add(f1)
+    db.session.add(f2)
+    db.session.add(f3)
+    db.session.add(f4)
+    db.session.add(f5)
+    db.session.add(f6)
+    db.session.add(f7)
+    db.session.add(f8)
+    db.session.add(f9)
+    db.session.add(f10)
+    db.session.add(f11)
+    db.session.add(f12)
+    db.session.commit()
 
     # Add entries to Timetable table
     t1 = Timetable(output_time_minutes=650, weekday="Monday", food_id=1)
