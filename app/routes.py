@@ -20,11 +20,9 @@ import io
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
-    print(scheduler.get_jobs())
     form = FoodDispenseForm()
     if form.validate_on_submit():
         dispense_food(form.food.data, None, 0)
-        flash("Food successfully dispensed!")
         return redirect(url_for("index"))
     return render_template("index.html", form=form, title="Home")
 

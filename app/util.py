@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from flask import flash
+
 from app import app, db, mqtt, scheduler
 from app.models import Food, FoodDispensed, Timetable
 #import RPi.GPIO as GPIO
@@ -47,6 +50,10 @@ def dispense_food(food_id, timetable_id, trigger):
         db.session.add(dispension)
         food.amount = food.amount - food.portion_size
         db.session.commit()
+        flash("Food successfully dispensed!")
+    elif trigger != 1:
+        flash("Food could not be dispensed! Ensure that enough food is registered in the application!")
+
 
 
 
