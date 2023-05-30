@@ -47,6 +47,11 @@ class FoodForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class FoodDispenseForm(FlaskForm):
+    """
+    Represents the form for choosing the food to be dispensed.
+    Enables the sending of the form data with a submit field.
+    :param FlaskForm: a required (by the library) parameter to process a form
+    """
     food = SelectField(
         label="Select food to be dispensed",
         validators=[DataRequired()],

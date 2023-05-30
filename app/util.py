@@ -14,12 +14,22 @@ gpio_pins = [6, 13, 19, 26]
 
 
 def setupGPIO():
+    """
+    This function sets up the GPIO mode and adjusts if warnings should be displayed.
+    It is used automatically by the library RPi.GPIO when the application launches.
+    """
     pass
     #GPIO.setmode(GPIO.BCM)
     #GPIO.setwarnings(False)
 
 
 def add_jobs():
+    """
+    This function enables all timetables to be converted into "jobs", which then get executed at the set time
+    saved in the database. All TimeTable objects are queried and subsequently turned into jobs. The day of the week,
+    hour and minute have to be calculated back into the correct measurement by calling the respective functions. The id
+    of a job is the id of the associated TimeTable object. 'cron' sets the job execution to weekly.
+    """
     times = Timetable.query.all()
     for time in times:
         scheduler.add_job(dispense_food, 'cron', (time.food_id, time.id, 1),
@@ -35,6 +45,12 @@ def get_food():
 
 
 def dispense_food(food_id, timetable_id, trigger):
+    """
+    Dispense food, send the MQTT message and save the dispension in the database.
+    :param food_id: the id of the food being dispensed
+    :param timetable_id: the id of the triggering TimeTable object or None
+    :param trigger: 1 if automatic triggering of dispension; 0 if manual triggering of dispension
+    """
     food = Food.query.get(food_id)
     if food is not None and food.amount >= food.portion_size:
         #mymotor.motor_run(gpio_pins, 0.001, 42, True, False, "half", 0.001)
@@ -57,13 +73,28 @@ def dispense_food(food_id, timetable_id, trigger):
 
 
 def calculate_hour(minutes):
+    """
+    Calculates given minutes to hours by using floor division.
+    :param minutes: the minutes to be converted into hours
+    :return: amount of full hours in given minutes
+    """
     return minutes//60
 
 def calculate_minutes_remaining(minutes):
+    """
+    Calculates given minutes to minutes left after all full hours are subtracted by floor division.
+    :param minutes: the minutes to be converted into remaining minutes by subtracting all full hours
+    :return: remaining minutes after subtracting all full hours
+    """
     return minutes-(calculate_hour(minutes)*60)
 
 
 def calculate_weekday(weekday):
+    """
+    Converts the full name of a weekday to its three lettered short description for usage in the job scheduling.
+    :param weekday: the weekday in full writing, e.x. Monday
+    :returns: the given weekday in short description, e.x. mon
+    """
     if weekday == "Monday":
         return "mon"
     elif weekday == "Tuesday":

@@ -20,6 +20,10 @@ import io
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
+    """
+    Provides the index site of the application which allows food to be dispensed manually.
+    :return: the HTML site enabling manual food dispension
+    """
     form = FoodDispenseForm()
     if form.validate_on_submit():
         dispense_food(form.food.data, None, 0)
