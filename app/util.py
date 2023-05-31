@@ -185,6 +185,16 @@ def create_figure(food_id):
     x_values = [fd.created.strftime("%d.%m.%Y at %H:%M:%S") for fd in food_dispensed_list]
     y_values = [fd.amount_dispensed for fd in food_dispensed_list]
 
+    data_dict = {}
+    for x, y in zip(x_values, y_values):
+        if x in data_dict:
+            data_dict[x] += y
+        else:
+            data_dict[x] = y
+
+    x_values = list(data_dict.keys())
+    y_values = list(data_dict.values())
+
     fig = Figure()
     ax = fig.add_subplot(111)
     ax.plot(x_values, y_values)
