@@ -182,7 +182,7 @@ def create_figure(food_id):
         db.session.query(FoodDispensed).filter_by(food_id=food_id).all()
     )
 
-    x_values = [fd.created.strftime("%d.%m.%Y at %H:%M:%S") for fd in food_dispensed_list]
+    x_values = [fd.created.strftime("%d.%m.%Y") for fd in food_dispensed_list]
     y_values = [fd.amount_dispensed for fd in food_dispensed_list]
 
     data_dict = {}
