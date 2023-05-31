@@ -2,6 +2,9 @@ from app import db
 
 
 class Food(db.Model):
+    """
+    This class represents the food table in the database.
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False, unique=True)
     portion_size = db.Column(db.Integer, nullable=False)
@@ -27,6 +30,9 @@ class Food(db.Model):
 
 
 class FoodDispensed(db.Model):
+    """
+    This class represents the food_dispensed table in the database.
+    """
     id = db.Column(db.Integer, primary_key=True)
     amount_dispensed = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime, nullable=False)
@@ -46,6 +52,9 @@ class FoodDispensed(db.Model):
 
 
 class Timetable(db.Model):
+    """
+    This class represents the timetable table in the database.
+    """
     id = db.Column(db.Integer, primary_key=True)
     output_time_minutes = db.Column(db.Integer, nullable=False) # probably save as seconds since midnight
     weekday = db.Column(db.String, nullable=False)

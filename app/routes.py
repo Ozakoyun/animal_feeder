@@ -33,12 +33,20 @@ def index():
 
 @app.route("/food")
 def food():
+    """
+    Provides the food site of the application which allows food to be added, edited and deleted.
+    :return: the HTML site enabling food to be added, edited and deleted
+    """
     all_food = Food.query.all()
     return render_template("food.html", title="Food", all_food=all_food)
 
 
 @app.route("/add_food", methods=["GET", "POST"])
 def add_food():
+    """
+    Provides the add_food site of the application which allows food to be added.
+    :return: the HTML site enabling food to be added
+    """
     form = FoodForm()
     if form.cancel.data:
         return redirect(url_for("food"))
@@ -57,6 +65,11 @@ def add_food():
 
 @app.route("/edit_food/<int:food_id>", methods=["GET", "POST"])
 def edit_food(food_id):
+    """
+    Provides the edit_food site of the application which allows food to be edited.
+    :param food_id: the id of the food to be edited
+    :return: the HTML site enabling food to be edited
+    """
     form = FoodForm()
     food = Food.query.filter_by(id=food_id).first()
     if form.cancel.data:
@@ -76,6 +89,11 @@ def edit_food(food_id):
 
 @app.route("/delete_food/<int:food_id>", methods=["GET", "POST"])
 def delete_food(food_id):
+    """
+    Provides the delete_food site of the application which allows food to be deleted.
+    :param food_id: the id of the food to be deleted
+    :return: the HTML site enabling food to be deleted
+    """
     food = Food.query.filter_by(id=food_id).first()
     form = CancelForm()
     if form.cancel.data:
@@ -92,6 +110,10 @@ def delete_food(food_id):
 
 @app.route("/timetable")
 def timetable():
+    """
+    Provides the timetable site of the application which allows food to be dispensed automatically.
+    :return: the HTML site enabling food to be dispensed automatically
+    """
     all_timetable = Timetable.query.all()
     foods = []
     times = []
@@ -112,6 +134,10 @@ def timetable():
 
 @app.route("/add_timetable", methods=["GET", "POST"])
 def add_timetable():
+    """
+    Provides the add_timetable site of the application which allows food to be dispensed automatically.
+    :return: the HTML site enabling food to be dispensed automatically
+    """
     form = TimeTableForm()
     if form.validate_on_submit():
         timetable = Timetable(
@@ -138,6 +164,11 @@ def add_timetable():
 
 @app.route("/edit_timetable/<int:timetable_id>", methods=["GET", "POST"])
 def edit_timetable(timetable_id):
+    """
+    Provides the edit_timetable site of the application which allows food to be dispensed automatically.
+    :param timetable_id: the id of the timetable to be edited
+    :return: the HTML site enabling food to be dispensed automatically
+    """
     form = TimeTableForm()
     timetable = Timetable.query.filter_by(id=timetable_id).first()
     print(timetable)
@@ -170,6 +201,11 @@ def edit_timetable(timetable_id):
 
 @app.route("/delete_timetable/<int:timetable_id>", methods=["GET", "POST"])
 def delete_timetable(timetable_id):
+    """
+    Provides the delete_timetable site of the application which allows food to be dispensed automatically.
+    :param timetable_id: the id of the timetable to be deleted
+    :return: the HTML site enabling food to be dispensed automatically
+    """
     timetable = Timetable.query.filter_by(id=timetable_id).first()
     form = CancelForm()
     if form.cancel.data:
@@ -185,16 +221,30 @@ def delete_timetable(timetable_id):
 
 @app.route("/statistics")
 def statistics():
+    """
+    Provides the statistics site of the application.
+    :return: the HTML site to get an overview of the dispensed food
+    """
     statistics = getOverview()
     return render_template("statistics.html", title="Statistics", statistics=statistics)
 
 @app.route("/detailed_statistics/<int:food_id>")
 def detailed_statistics(food_id):
+    """
+    Provides the detailed_statistics site of the application.
+    :param food_id: the id of the food to get a detailed overview of
+    :return: the HTML site to get a detailed overview of the dispensed food
+    """
     foodName, dispenses = getDetailedOverview(food_id)
     return render_template("detailed_statistics.html", title="Detailed Statistics", foodName=foodName, dispenses=dispenses, food_id=food_id)
 
 @app.route("/plot.png/<int:food_id>")
 def plot_png(food_id):
+    """
+    Provides the plot_png site of the application.
+    :param food_id: the id of the food to get a plot of
+    :return: image of plot
+    """
     fig = create_figure(food_id)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
@@ -202,11 +252,23 @@ def plot_png(food_id):
 
 @app.template_filter("datetimeformat")
 def datetimeformat(value, datetime_format="%d.%m.%Y at %H:%M:%S"):
+    """
+    Converts a datetime object into a string with the given format.
+    :param value: the datetime object to be converted
+    :param datetime_format: the format of the datetime object
+    :return: the datetime object as a string with the given format
+    """
     return value.strftime(datetime_format)
 
 
 @app.template_global(name="zip")
 def _zip(*args, **kwargs):  # to not overwrite builtin zip in globals
+    """
+    Returns the zip function.
+    :param args: the arguments of the zip function
+    :param kwargs: the keyword arguments of the zip function
+    :return: the zip function
+    """
     return __builtins__.zip(*args, **kwargs)
 
 

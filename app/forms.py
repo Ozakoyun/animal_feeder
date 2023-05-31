@@ -12,10 +12,19 @@ from app.util import get_food
 
 
 class ManualFoodForm(FlaskForm):
+    """
+    Enables the sending of the form data with a submit field.
+    :param FlaskForm: a required (by the library) parameter to process a form
+    """
     submit = SubmitField("Feed")
 
 
 class TimeTableForm(FlaskForm):
+    """
+    Represents the form for creating a timetable.
+    Enables the sending of the form data with a submit field.
+    :param FlaskForm: a required (by the library) parameter to process a form
+    """
     food = SelectField(
         label="Select food",
         validators=[DataRequired()],
@@ -40,6 +49,11 @@ class TimeTableForm(FlaskForm):
 
 
 class FoodForm(FlaskForm):
+    """
+    Represents the form for creating a food.
+    Enables the sending of the form data with a submit field.
+    :param FlaskForm: a required (by the library) parameter to process a form
+    """
     name = StringField("Name", validators=[DataRequired()])
     portion_size = IntegerField("Portion size", validators=[DataRequired()])
     amount = IntegerField("Amount", validators=[DataRequired()])
@@ -60,5 +74,10 @@ class FoodDispenseForm(FlaskForm):
     submit = SubmitField("Dispense now")
 
 class CancelForm(FlaskForm):
+    """
+    Represents the form for deleting a timetable or food.
+    Enables the sending of the form data with a submit field.
+    :param FlaskForm: a required (by the library) parameter to process a form
+    """
     cancel = SubmitField(label="No", render_kw={"formnovalidate": True})
     submit = SubmitField("Yes")

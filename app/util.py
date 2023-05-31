@@ -39,6 +39,9 @@ def add_jobs():
 
 
 def get_food():
+    """
+    This function queries all Food objects and returns them as a list of tuples containing the id and name of the food.
+    """
     food = Food.query.all()
     food = [(f.id, f.name) for f in food]
     return food
@@ -111,6 +114,10 @@ def calculate_weekday(weekday):
         return "sun"
 
 def getOverview():
+    """
+    This function queries all Food objects and returns them as a list of dictionaries containing the id, name, lastDispensed, totalDispenses, amountDispensed and amountRemaining of the food.
+    :returns: a list of dictionaries containing the id, name, lastDispensed, totalDispenses, amountDispensed and amountRemaining for each food object
+    """
     food = Food.query.all()
     statistics = []
     for f in food:
@@ -144,6 +151,11 @@ def getOverview():
 
 
 def getDetailedOverview(foodId):
+    """
+    This function queries all FoodDispensed objects for a given foodId and returns them as a list of tuples containing the name of the food and the dispenses.
+    :param: foodId: the id of the food for which the dispenses should be queried
+    :returns: a tuple containing the name of the food and a list of tuples containing the amount dispensed, the date and time of the dispense and the trigger of the dispense
+    """
     foodName = Food.query.filter_by(id=foodId).first().name
     dispenses = (
         FoodDispensed.query.filter_by(food_id=foodId)
@@ -161,6 +173,11 @@ def getDetailedOverview(foodId):
 
 
 def create_figure(food_id):
+    """
+    This function queries all FoodDispensed objects for a given foodId and returns them as a matplotlib figure.
+    :param: foodId: the id of the food for which the dispenses should be queried
+    :returns: a matplotlib figure containing the amount dispensed over time
+    """
     food_dispensed_list = (
         db.session.query(FoodDispensed).filter_by(food_id=food_id).all()
     )
