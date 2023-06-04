@@ -45,7 +45,7 @@ In dieser Anleitung wird erklärt, wie die Applikation auf einen „neuen“ Ras
 	```sudo apt update```
 	```sudo apt upgrade```
 
-2. Als nächstes muss kontrolliert werden ob die richtigen Versionen von Python und Pip ver-wendet werden. Diese sind (Versionen) Dazu werden die folgenden Kommandos ausgeführt.
+2. Als nächstes muss kontrolliert werden ob die richtigen Versionen von Python und Pip ver-wendet werden. Diese sind 3.9.2 für Python und 21.3.1 für Pip. Die Lauffähigkeit der Applikation ist nur für diese Versionen gegeben. Dazu werden die folgenden Kommandos ausgeführt.
 	```python --version```
 	```pip –version```
 
