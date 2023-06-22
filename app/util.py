@@ -56,7 +56,7 @@ def dispense_food(food_id, timetable_id, trigger):
     """
     food = Food.query.get(food_id)
     if food is not None and food.amount >= food.portion_size:
-        #mymotor.motor_run(gpio_pins, 0.001, 42, True, False, "half", 0.001)
+        mymotor.motor_run(gpio_pins, 0.001, 42, True, False, "half", 0.001)
         trigger_word = None
         if trigger == 1:
             trigger_word = "automatic"
