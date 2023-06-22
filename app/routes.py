@@ -101,9 +101,10 @@ def delete_food(food_id):
     if form.validate_on_submit():
         db.session.delete(food)
         db.session.commit()
-        scheduler.shutdown()
-        scheduler.start()
+        scheduler.remove_all_jobs()
+        print(scheduler.get_jobs())
         add_jobs()
+        print(scheduler.get_jobs())
         return redirect(url_for("food"))
     return render_template("delete_food.html", title="Delete Food", form=form)
 
@@ -213,9 +214,10 @@ def delete_timetable(timetable_id):
     if form.validate_on_submit():
         db.session.delete(timetable)
         db.session.commit()
-        scheduler.shutdown()
-        scheduler.start()
+        scheduler.remove_all_jobs()
+        print(scheduler.get_jobs())
         add_jobs()
+        print(scheduler.get_jobs())
         return redirect(url_for("timetable"))
     return render_template("delete_timetable.html", title="Delete Timetable", form=form)
 

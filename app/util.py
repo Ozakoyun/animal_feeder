@@ -5,12 +5,12 @@ from sqlalchemy import func
 
 from app import app, db, mqtt, scheduler
 from app.models import Food, FoodDispensed, Timetable
-#import RPi.GPIO as GPIO
-#from RpiMotorLib import RpiMotorLib
+import RPi.GPIO as GPIO
+from RpiMotorLib import RpiMotorLib
 from matplotlib.figure import Figure
 
 gpio_pins = [6, 13, 19, 26]
-#mymotor = RpiMotorLib.BYJMotor("MyMotorOne","28BYJ")
+mymotor = RpiMotorLib.BYJMotor("MyMotorOne","28BYJ")
 
 
 def setupGPIO():
@@ -19,8 +19,8 @@ def setupGPIO():
     It is used automatically by the library RPi.GPIO when the application launches.
     """
     pass
-    #GPIO.setmode(GPIO.BCM)
-    #GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
 
 
 def add_jobs():
@@ -68,7 +68,8 @@ def dispense_food(food_id, timetable_id, trigger):
         db.session.add(dispension)
         food.amount = food.amount - food.portion_size
         db.session.commit()
-        flash("Food successfully dispensed!")
+        if trigger != 1:
+            flash("Food successfully dispensed!")
     elif trigger != 1:
         flash("Food could not be dispensed! Ensure that enough food is registered in the application!")
 
