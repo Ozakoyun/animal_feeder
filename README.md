@@ -60,7 +60,10 @@ In dieser Anleitung wird erklärt, wie die Applikation auf einen „neuen“ Ras
 6. In diesem Schritt werden nun die benötigten Bibliotheken, mit dem unteren Kommando, für das Projekt installiert.
 	```pip install -r requirements.txt```
 
-7. Zuletzt wird mithilfe des nachfolgenden Kommandos die Applikation auf dem Raspberry Pi gestartet.
+7. In diesem Schritt wird nun eine weitere benötigte Bibliothek, mit dem unteren Kommando, für das Projekt installiert.
+	```sudo apt-get install libatlas-base-dev```
+
+8. Zuletzt wird mithilfe des nachfolgenden Kommandos die Applikation auf dem Raspberry Pi gestartet.
 	```flask run```
 
 Fertig. Die Applikation befindet sich nun am Raspberry Pi.
