@@ -1,6 +1,4 @@
 # Animal Feeder
-[General explanaition]
-
 ## How to install
 ### Installation Raspberry Pi – Starten der Applikation über SSH:
 Bei dieser Anleitung wird davon ausgegangen, dass der Nutzer die fertige Einheit bekommt, heißt keine Verkabelungen selbst durchführen muss und auch nicht das fertige Projekt instal-lieren muss. Die Schritte 1-3 müssen nur bei der ersten Installation oder wenn das verwende-te WLAN gewechselt wird, durchgeführt werden. Der 4. Schritt ist bei jedem Neustart not-wendig. 
